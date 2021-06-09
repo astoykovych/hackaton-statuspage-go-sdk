@@ -17,9 +17,10 @@ type ComponentGroupFull struct {
 
 var componentGroupsResType = "component-groups"
 
-func CreateComponentGroup(pageID string, componentGroup *ComponentGroup) (*ComponentGroupFull, error) {
+func CreateComponentGroup(client *RClient, pageID string, componentGroup *ComponentGroup) (*ComponentGroupFull, error) {
 	var cg ComponentGroupFull
 	err := createResource(
+        client,
 		pageID,
 		componentGroupsResType,
 		struct {
@@ -31,9 +32,10 @@ func CreateComponentGroup(pageID string, componentGroup *ComponentGroup) (*Compo
 	return &cg, err
 }
 
-func GetComponentGroup(pageID string, componentGroupID string) (*ComponentGroupFull, error) {
+func GetComponentGroup(client *RClient, pageID string, componentGroupID string) (*ComponentGroupFull, error) {
 	var cg ComponentGroupFull
 	err := getResource(
+        client,
 		pageID,
 		componentGroupsResType,
 		componentGroupID,
@@ -43,10 +45,11 @@ func GetComponentGroup(pageID string, componentGroupID string) (*ComponentGroupF
 	return &cg, err
 }
 
-func UpdateComponentGroup(pageID string, componentGroupID string, componentGroup *ComponentGroup) (*ComponentGroupFull, error) {
+func UpdateComponentGroup(client *RClient, pageID string, componentGroupID string, componentGroup *ComponentGroup) (*ComponentGroupFull, error) {
 	var cg ComponentGroupFull
 
 	err := updateResource(
+        client,
 		pageID,
 		componentGroupsResType,
 		componentGroupID,
@@ -59,6 +62,6 @@ func UpdateComponentGroup(pageID string, componentGroupID string, componentGroup
 	return &cg, err
 }
 
-func DeleteComponentGroup(pageID string, componentGroupID string) (err error) {
-	return deleteResource(pageID, componentGroupsResType, componentGroupID)
+func DeleteComponentGroup(client *RClient, pageID string, componentGroupID string) (err error) {
+	return deleteResource(client, pageID, componentGroupsResType, componentGroupID)
 }

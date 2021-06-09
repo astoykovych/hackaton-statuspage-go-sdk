@@ -9,24 +9,33 @@ import (
     "net/http"
 // 	"time"
     "github.com/go-resty/resty/v2"
-    "os"
+//     "os"
 )
 
 const apiRoot = "https://api.statuspage.io/v1"
 
-var tokenID string
 
-func init() {
-	tokenID = os.Getenv("STATUSPAGE_TOKEN")
+type RClient struct {
+	token           string
+	restyClient     *resty.Client
+}
+
+func NewClient(token string) *RClient {
+
+    rc := RClient{
+          		token:       token,
+          		restyClient: resty.New().SetRetryCount(10),
+          	}
+	return &rc
 }
 
 
-func createResource(pageID string, resourceType string, body interface{}, result interface{}) error {
+func createResource(client *RClient, pageID string, resourceType string, body interface{}, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType
     fmt.Println("=CREATE====URL=====>")
     fmt.Println(actualURL)
-    client := resty.New()
-    resp, _ := client.R().SetAuthToken(tokenID).
+
+    resp, _ := client.restyClient.R().SetAuthToken(client.token).
         SetHeader("Content-Type", "application/json").
         SetBody(body).
         Post(actualURL)
@@ -43,12 +52,12 @@ func createResource(pageID string, resourceType string, body interface{}, result
 	return fmt.Errorf("failed creating resource, request returned %d, full response: %+v", resp.StatusCode(), resp)
 }
 
-func getResource(pageID string, resourceType string, ID string, result interface{}) error {
+func getResource(client *RClient, pageID string, resourceType string, ID string, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
     fmt.Println("=GET====URL=====>")
     fmt.Println(actualURL)
-    client := resty.New()
-    resp, _ := client.R().SetAuthToken(tokenID).
+
+    resp, _ := client.restyClient.R().SetAuthToken(client.token).
         Get(actualURL)
 
 	switch resp.StatusCode() {
@@ -68,12 +77,12 @@ func getResource(pageID string, resourceType string, ID string, result interface
 	}
 }
 
-func updateResource(pageID string, resourceType string, ID string, body interface{}, result interface{}) error {
+func updateResource(client *RClient, pageID string, resourceType string, ID string, body interface{}, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
     fmt.Println("=UPDATE====URL=====>")
     fmt.Println(actualURL)
-    client := resty.New()
-    resp, _ := client.R().SetAuthToken(tokenID).
+
+    resp, _ := client.restyClient.R().SetAuthToken(client.token).
         SetHeader("Content-Type", "application/json").
         SetBody(body).
         Put(actualURL)
@@ -92,12 +101,12 @@ func updateResource(pageID string, resourceType string, ID string, body interfac
 }
 
 
-func deleteResource(pageID string, resourceType string, ID string) error {
+func deleteResource(client *RClient, pageID string, resourceType string, ID string) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
     fmt.Println("=DELETE====URL=====>")
     fmt.Println(actualURL)
-    client := resty.New()
-    resp, err := client.R().SetAuthToken(tokenID).
+
+    resp, err := client.restyClient.R().SetAuthToken(client.token).
         Delete(actualURL)
 
     if err != nil {
