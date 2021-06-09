@@ -3,9 +3,9 @@ package statuspage
 import (
 	"testing"
 	"os"
-	"assert"
+    "github.com/stretchr/testify/assert"
+//     "fmt"
 )
-
 
 var pageID string
 
@@ -13,19 +13,35 @@ func init() {
 	pageID = os.Getenv("STATUSPAGE_PAGE")
 }
 
-func TestCreateComponentGroup(t *testing.T) {
 
-    cg := struct {
-          				Name        string
-          				Description string
-          			}{
-          				"group_name",
-          				"group description",
-          			}
+func TestEnvVariables (t *testing.T) {
 
-    compGroup, err := CreateComponentGroup(pageID, cg)
+    assert.True(t, tokenID != "")
+    assert.True(t, pageID != "")
 
+}
+
+
+func TestCreateComponentGroup (t *testing.T) {
+
+    testComponent := "r374kwg6gc1s"
+
+    cg := ComponentGroup {Name: "Test Group with API", Description: "Terraform created", Components: []string {testComponent}}
+
+    compGroup, _ := CreateComponentGroup(pageID, &cg)
     assert.Equal(t, pageID, compGroup.PageID)
     assert.True(t, compGroup.Position > 0)
+
+    ucg := ComponentGroup {Name: "Updated Test Group with API", Description: "Updated Terraform created", Components: []string {testComponent}}
+    updatedCompGroup, _ := UpdateComponentGroup(pageID, compGroup.ID, &ucg)
+    assert.Equal(t, pageID, updatedCompGroup.PageID)
+    assert.True(t, updatedCompGroup.Position > 0)
+    assert.True(t, updatedCompGroup.Position == compGroup.Position)
+
+    readCompGroup, _ := GetComponentGroup(pageID, updatedCompGroup.ID)
+    assert.Equal(t, pageID, readCompGroup.PageID)
+
+    err := DeleteComponentGroup(pageID, readCompGroup.ID)
+    assert.Equal(t, nil, err)
 }
 

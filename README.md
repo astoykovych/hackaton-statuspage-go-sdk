@@ -1,7 +1,7 @@
 # Installing the env
     go mod init statuspage
     go mod tidy
-    go get "github.com/stretchr/testify/assert"
+    go get github.com/stretchr/testify/assert
 
 # Running the tests
     go test

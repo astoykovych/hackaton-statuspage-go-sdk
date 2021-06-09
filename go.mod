@@ -1,4 +1,4 @@
-module github.com/astoykovych/hackaton-statuspage-go-sdk
+module statuspage
 
 go 1.16
 
