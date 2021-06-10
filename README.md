@@ -1,5 +1,5 @@
 # Installing the env
-    go mod init statuspage
+    go mod init github.com/astoykovych/hackaton-statuspage-go-sdk
     go mod tidy
     go get github.com/stretchr/testify/assert
 
