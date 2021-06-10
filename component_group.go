@@ -3,7 +3,6 @@ package statuspage
 type ComponentGroup struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description,omitempty"`
-	Position    string  `json:"position,omitempty"`
 	Components  []string `json:"components,omitempty"`
 }
 
