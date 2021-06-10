@@ -3,7 +3,7 @@ package statuspage
 type ComponentGroup struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description,omitempty"`
-	Position    int32   `json:"position,omitempty"`
+	Position    string  `json:"position,omitempty"`
 	Components  []string `json:"components,omitempty"`
 }
 
@@ -11,7 +11,7 @@ type ComponentGroupFull struct {
 	ComponentGroup
 	ID        string `json:"id"`
 	PageID    string `json:"page_id"`
-	Position  int32  `json:"position"`
+	Position  string  `json:"position"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
