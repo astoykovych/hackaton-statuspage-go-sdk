@@ -46,5 +46,8 @@ func TestCreateComponentGroup (t *testing.T) {
 
     err := DeleteComponentGroup(client, pageID, readCompGroup.ID)
     assert.Equal(t, nil, err)
+
+    cgs, _ := ListAllComponentGroups(client, pageID)
+    assert.Equal(t, (*cgs)[0].PageID, pageID)
 }
 

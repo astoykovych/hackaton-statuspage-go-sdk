@@ -29,11 +29,15 @@ func NewClient(token string) *RClient {
 	return &rc
 }
 
+func logURL(name string, url string) {
+    fmt.Printf("=%s====URL=====>", name)
+    fmt.Println(url)
+}
+
 
 func createResource(client *RClient, pageID string, resourceType string, body interface{}, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType
-    fmt.Println("=CREATE====URL=====>")
-    fmt.Println(actualURL)
+    logURL("CREATE", actualURL)
 
     resp, _ := client.restyClient.R().SetAuthToken(client.token).
         SetHeader("Content-Type", "application/json").
@@ -54,8 +58,7 @@ func createResource(client *RClient, pageID string, resourceType string, body in
 
 func getResource(client *RClient, pageID string, resourceType string, ID string, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
-    fmt.Println("=GET====URL=====>")
-    fmt.Println(actualURL)
+    logURL("GET", actualURL)
 
     resp, _ := client.restyClient.R().SetAuthToken(client.token).
         Get(actualURL)
@@ -79,8 +82,7 @@ func getResource(client *RClient, pageID string, resourceType string, ID string,
 
 func updateResource(client *RClient, pageID string, resourceType string, ID string, body interface{}, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
-    fmt.Println("=UPDATE====URL=====>")
-    fmt.Println(actualURL)
+    logURL("UPDATE", actualURL)
 
     resp, _ := client.restyClient.R().SetAuthToken(client.token).
         SetHeader("Content-Type", "application/json").
@@ -103,8 +105,7 @@ func updateResource(client *RClient, pageID string, resourceType string, ID stri
 
 func deleteResource(client *RClient, pageID string, resourceType string, ID string) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
-    fmt.Println("=DELETE====URL=====>")
-    fmt.Println(actualURL)
+    logURL("DELETE", actualURL)
 
     resp, err := client.restyClient.R().SetAuthToken(client.token).
         Delete(actualURL)
@@ -118,4 +119,23 @@ func deleteResource(client *RClient, pageID string, resourceType string, ID stri
     }
 
     return fmt.Errorf("failed deleting %s, request returned %d", resourceType, resp.StatusCode())
+}
+
+func listResources(client *RClient, pageID string, resourceType string, result *[]ComponentGroupFull) error {
+    actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType
+    logURL("List All", actualURL)
+
+    resp, _ := client.restyClient.R().SetAuthToken(client.token).
+        Get(actualURL)
+
+    if resp.StatusCode() == http.StatusOK {
+            bodyBytes, err := ioutil.ReadAll(bytes.NewReader(resp.Body()))
+            if err != nil {
+                return err
+            }
+            fmt.Println(resp)
+            return json.Unmarshal(bodyBytes, &result)
+    	}
+
+    return fmt.Errorf("failed getting all resources %s, request returned %d", resourceType, resp.StatusCode())
 }

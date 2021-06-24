@@ -10,7 +10,7 @@ type ComponentGroupFull struct {
 	ComponentGroup
 	ID        string `json:"id"`
 	PageID    string `json:"page_id"`
-	Position  string  `json:"position"`
+	Position  string `json:"position"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
@@ -64,4 +64,16 @@ func UpdateComponentGroup(client *RClient, pageID string, componentGroupID strin
 
 func DeleteComponentGroup(client *RClient, pageID string, componentGroupID string) (err error) {
 	return deleteResource(client, pageID, componentGroupsResType, componentGroupID)
+}
+
+func ListAllComponentGroups(client *RClient, pageID string) (*[]ComponentGroupFull, error) {
+	var cgs []ComponentGroupFull
+	err := listResources(
+        client,
+		pageID,
+		componentGroupsResType,
+		&cgs,
+	)
+
+	return &cgs, err
 }
