@@ -26,16 +26,23 @@ func TestEnvVariables (t *testing.T) {
 
 func TestCreateComponentGroup (t *testing.T) {
 
-    testComponent := "r374kwg6gc1s"
     client := NewClient(tokenID)
 
-    cg := ComponentGroup {Name: "Test Group with API", Description: "Terraform created", Components: []string {testComponent}}
+    // Component for testing
+    c := Component {Name: "Test Component (for Groups testing) with API",
+            Description: "Terraform created",
+            Showcase: true,
+            Status: "operational",
+            OnlyShowIfDegraded: false}
+    comp, _ := CreateComponent(client, pageID, &c)
+
+    cg := ComponentGroup {Name: "Test Group with API", Description: "Terraform created", Components: []string {comp.ID}}
 
     compGroup, _ := CreateComponentGroup(client, pageID, &cg)
     assert.Equal(t, pageID, compGroup.PageID)
     assert.True(t, compGroup.Position > 0)
 
-    ucg := ComponentGroup {Name: "Updated Test Group with API", Description: "Updated Terraform created", Components: []string {testComponent}}
+    ucg := ComponentGroup {Name: "Updated Test Group with API", Description: "Updated Terraform created", Components: []string {comp.ID}}
     updatedCompGroup, _ := UpdateComponentGroup(client, pageID, compGroup.ID, &ucg)
     assert.Equal(t, pageID, updatedCompGroup.PageID)
     assert.True(t, updatedCompGroup.Position > 0)
@@ -44,10 +51,14 @@ func TestCreateComponentGroup (t *testing.T) {
     readCompGroup, _ := GetComponentGroup(client, pageID, updatedCompGroup.ID)
     assert.Equal(t, pageID, readCompGroup.PageID)
 
+    cgs, _ := ListAllComponentGroups(client, pageID)
+    assert.Equal(t, (*cgs)[0].PageID, pageID)
+
+    // Cleanup
     err := DeleteComponentGroup(client, pageID, readCompGroup.ID)
     assert.Equal(t, nil, err)
 
-    cgs, _ := ListAllComponentGroups(client, pageID)
-    assert.Equal(t, (*cgs)[0].PageID, pageID)
+    cerr := DeleteComponent(client, pageID, comp.ID)
+    assert.Equal(t, nil, cerr)
 }
 

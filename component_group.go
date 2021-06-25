@@ -10,7 +10,7 @@ type ComponentGroupFull struct {
 	ComponentGroup
 	ID        string `json:"id"`
 	PageID    string `json:"page_id"`
-	Position  string `json:"position"`
+	Position  int32 `json:"position"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
@@ -72,6 +72,7 @@ func ListAllComponentGroups(client *RClient, pageID string) (*[]ComponentGroupFu
         client,
 		pageID,
 		componentGroupsResType,
+        &map[string]string{},
 		&cgs,
 	)
 

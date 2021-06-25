@@ -13,7 +13,7 @@ import (
 )
 
 const apiRoot = "https://api.statuspage.io/v1"
-
+const logging_on = true
 
 type RClient struct {
 	token           string
@@ -29,15 +29,17 @@ func NewClient(token string) *RClient {
 	return &rc
 }
 
-func logURL(name string, url string) {
-    fmt.Printf("=%s====URL=====>", name)
-    fmt.Println(url)
+func log(debug_name string, debug_value interface{}) {
+    if logging_on {
+        fmt.Printf("DEBUG: [%s] => ", debug_name)
+        fmt.Println(debug_value)
+    }
 }
 
 
 func createResource(client *RClient, pageID string, resourceType string, body interface{}, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType
-    logURL("CREATE", actualURL)
+    log("CREATE", actualURL)
 
     resp, _ := client.restyClient.R().SetAuthToken(client.token).
         SetHeader("Content-Type", "application/json").
@@ -49,7 +51,7 @@ func createResource(client *RClient, pageID string, resourceType string, body in
         if err != nil {
             return err
         }
-        fmt.Println(resp)
+        log("RESPONSE", resp)
         return json.Unmarshal(bodyBytes, &result)
 	}
 
@@ -58,7 +60,7 @@ func createResource(client *RClient, pageID string, resourceType string, body in
 
 func getResource(client *RClient, pageID string, resourceType string, ID string, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
-    logURL("GET", actualURL)
+    log("GET", actualURL)
 
     resp, _ := client.restyClient.R().SetAuthToken(client.token).
         Get(actualURL)
@@ -69,7 +71,7 @@ func getResource(client *RClient, pageID string, resourceType string, ID string,
 		if err != nil {
 			return err
 		}
-        fmt.Println(resp)
+        log("RESPONSE", resp)
 		return json.Unmarshal(bodyBytes, &result)
 
 	case http.StatusNotFound:
@@ -82,7 +84,7 @@ func getResource(client *RClient, pageID string, resourceType string, ID string,
 
 func updateResource(client *RClient, pageID string, resourceType string, ID string, body interface{}, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
-    logURL("UPDATE", actualURL)
+    log("UPDATE", actualURL)
 
     resp, _ := client.restyClient.R().SetAuthToken(client.token).
         SetHeader("Content-Type", "application/json").
@@ -94,10 +96,9 @@ func updateResource(client *RClient, pageID string, resourceType string, ID stri
         if err != nil {
             return err
         }
-        fmt.Println(resp)
+        log("RESPONSE", resp)
         return json.Unmarshal(bodyBytes, &result)
 	}
-
 
 	return fmt.Errorf("failed updating %s, request returned %d", resourceType, resp.StatusCode())
 }
@@ -105,10 +106,11 @@ func updateResource(client *RClient, pageID string, resourceType string, ID stri
 
 func deleteResource(client *RClient, pageID string, resourceType string, ID string) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType + "/" + ID
-    logURL("DELETE", actualURL)
+    log("DELETE", actualURL)
 
     resp, err := client.restyClient.R().SetAuthToken(client.token).
         Delete(actualURL)
+    log("RESPONSE", resp)
 
     if err != nil {
         return err
@@ -121,11 +123,12 @@ func deleteResource(client *RClient, pageID string, resourceType string, ID stri
     return fmt.Errorf("failed deleting %s, request returned %d", resourceType, resp.StatusCode())
 }
 
-func listResources(client *RClient, pageID string, resourceType string, result *[]ComponentGroupFull) error {
+func listResources(client *RClient, pageID string, resourceType string, qparams *map[string]string, result interface{}) error {
     actualURL := apiRoot + "/pages/" + pageID + "/" + resourceType
-    logURL("List All", actualURL)
+    log("List All", actualURL)
 
     resp, _ := client.restyClient.R().SetAuthToken(client.token).
+        SetQueryParams(*qparams).
         Get(actualURL)
 
     if resp.StatusCode() == http.StatusOK {
@@ -133,7 +136,7 @@ func listResources(client *RClient, pageID string, resourceType string, result *
             if err != nil {
                 return err
             }
-            fmt.Println(resp)
+            log("RESPONSE", resp)
             return json.Unmarshal(bodyBytes, &result)
     	}
 

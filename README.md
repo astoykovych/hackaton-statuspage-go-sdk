@@ -5,6 +5,8 @@
 
 # Running the tests
     go test
+    go test -v -run TestCreateComponent
+
 
 
 # Reads
