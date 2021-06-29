@@ -46,12 +46,13 @@ func createResource(client *RClient, pageID string, resourceType string, body in
         SetBody(body).
         Post(actualURL)
 
+        log("RESPONSE", resp)
+
 	if resp.StatusCode() == http.StatusCreated {
         bodyBytes, err := ioutil.ReadAll(bytes.NewReader(resp.Body()))
         if err != nil {
             return err
         }
-        log("RESPONSE", resp)
         return json.Unmarshal(bodyBytes, &result)
 	}
 
@@ -65,13 +66,14 @@ func getResource(client *RClient, pageID string, resourceType string, ID string,
     resp, _ := client.restyClient.R().SetAuthToken(client.token).
         Get(actualURL)
 
+    log("RESPONSE", resp)
+
 	switch resp.StatusCode() {
 	case http.StatusOK:
 		bodyBytes, err := ioutil.ReadAll(bytes.NewReader(resp.Body()))
 		if err != nil {
 			return err
 		}
-        log("RESPONSE", resp)
 		return json.Unmarshal(bodyBytes, &result)
 
 	case http.StatusNotFound:
@@ -91,12 +93,13 @@ func updateResource(client *RClient, pageID string, resourceType string, ID stri
         SetBody(body).
         Put(actualURL)
 
+        log("RESPONSE", resp)
+
 	if resp.StatusCode() == http.StatusOK {
         bodyBytes, err := ioutil.ReadAll(bytes.NewReader(resp.Body()))
         if err != nil {
             return err
         }
-        log("RESPONSE", resp)
         return json.Unmarshal(bodyBytes, &result)
 	}
 
